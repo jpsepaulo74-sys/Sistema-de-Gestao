@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão de Vendas</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-store"></i>
+            <span>GestãoVendas</span>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="active" onclick="navigate('dashboard')">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </li>
+            <li onclick="navigate('vendas')">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Nova Venda</span>
+            </li>
+            <li onclick="navigate('historico')">
+                <i class="fas fa-history"></i>
+                <span>Histórico</span>
+            </li>
+            <li onclick="navigate('produtos')">
+                <i class="fas fa-box"></i>
+                <span>Produtos</span>
+            </li>
+            <li onclick="navigate('fornecedores')">
+                <i class="fas fa-truck"></i>
+                <span>Fornecedores</span>
+            </li>
+            <li onclick="navigate('categorias')">
+                <i class="fas fa-tags"></i>
+                <span>Categorias</span>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content" id="mainContent">
+
+        <!-- HEADER -->
+        <header class="top-header">
+            <button class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h2 id="pageTitle">Dashboard</h2>
+            <div class="header-right">
+                <span class="current-date" id="currentDate"></span>
+            </div>
+        </header>
+
+        <!-- PÁGINAS -->
+        <div class="page-content">
+
+            <!-- ==================== DASHBOARD ==================== -->
+            <section id="page-dashboard" class="page active">
+                <div class="stats-grid">
+                    <div class="stat-card blue">
+                        <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+                        <div class="stat-info">
+                            <h3 id="statVendas">0</h3>
+                            <p>Total de Vendas</p>
+                        </div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                        <div class="stat-info">
+                            <h3 id="statReceita">0,00 MT</h3>
+                            <p>Receita Total</p>
+                        </div>
+                    </div>
+                    <div class="stat-card purple">
+                        <div class="stat-icon"><i class="fas fa-box"></i></div>
+                        <div class="stat-info">
+                            <h3 id="statProdutos">0</h3>
+                            <p>Produtos</p>
+                        </div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-icon"><i class="fas fa-truck"></i></div>
+                        <div class="stat-info">
+                            <h3 id="statFornecedores">0</h3>
+                            <p>Fornecedores</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-clock"></i> Últimas Vendas</h3>
+                        </div>
+                        <div class="card-body">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Cliente</th>
+                                        <th>Total</th>
+                                        <th>Pagamento</th>
+                                        <th>Status</th>
+                                        <th>Data</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashUltimasVendas">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-trophy"></i> Produtos Mais Vendidos</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="dashTopProdutos" class="top-produtos-list">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== NOVA VENDA (PDV) ==================== -->
+            <section id="page-vendas" class="page">
+                <div class="pdv-container">
+                    <!-- Lado esquerdo - Produtos -->
+                    <div class="pdv-left">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-search"></i> Buscar Produto</h3>
+                            </div>
+                            <div class="card-body">
+                                <input type="text" id="buscaProdutoPDV" class="form-input"
+                                    placeholder="Buscar por nome ou código..." oninput="buscarProdutoPDV()">
+                                <div class="produtos-grid" id="produtosPDVGrid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lado direito - Carrinho -->
+                    <div class="pdv-right">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-shopping-cart"></i> Carrinho</h3>
+                                <button class="btn btn-sm btn-danger" onclick="limparCarrinho()">
+                                    <i class="fas fa-trash"></i> Limpar
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="carrinho-itens" id="carrinhoItens">
+                                    <p class="empty-message">Nenhum item no carrinho</p>
+                                </div>
+                            </div>
+                            <div class="carrinho-footer">
+                                <div class="carrinho-info">
+                                    <label>Pagamento:</label>
+                                    <select id="pdvPagamento" class="form-input">
+                                        <option value="dinheiro">💵 Dinheiro</option>
+                                        <option value="m-pesa">📱 M-Pesa / e-Mola</option>
+                                        <option value="cartao_credito">💳 Cartão Crédito</option>
+                                        <option value="cartao_debito">💳 Cartão Débito</option>
+                                    </select>
+                                </div>
+                                <div class="carrinho-info">
+                                    <label>Desconto (MT):</label>
+                                    <input type="number" id="pdvDesconto" class="form-input" value="0" min="0"
+                                        step="0.01" oninput="atualizarTotalCarrinho()">
+                                </div>
+                                <div class="carrinho-total">
+                                    <span>Subtotal:</span>
+                                    <span id="carrinhoSubtotal">0,00 MT</span>
+                                </div>
+                                <div class="carrinho-total destaque">
+                                    <span>TOTAL:</span>
+                                    <span id="carrinhoTotal">0,00 MT</span>
+                                </div>
+                                <button class="btn btn-success btn-block" onclick="finalizarVenda()">
+                                    <i class="fas fa-check-circle"></i> Finalizar Venda
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== HISTÓRICO DE VENDAS ==================== -->
+            <section id="page-historico" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-history"></i> Histórico de Vendas</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="filters">
+                            <input type="date" id="filtroDataInicio" class="form-input">
+                            <input type="date" id="filtroDataFim" class="form-input">
+                            <select id="filtroStatus" class="form-input">
+                                <option value="">Todos os Status</option>
+                                <option value="finalizada">Finalizada</option>
+                                <option value="cancelada">Cancelada</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="carregarHistorico()">
+                                <i class="fas fa-search"></i> Filtrar
+                            </button>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Total</th>
+                                    <th>Desconto</th>
+                                    <th>Pagamento</th>
+                                    <th>Status</th>
+                                    <th>Data</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historicoTabela">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== PRODUTOS ==================== -->
+            <section id="page-produtos" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-box"></i> Produtos</h3>
+                        <button class="btn btn-primary" onclick="abrirModalProduto()">
+                            <i class="fas fa-plus"></i> Novo Produto
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="filters">
+                            <input type="text" id="buscaProduto" class="form-input" placeholder="Buscar produto..."
+                                oninput="carregarProdutos()">
+                            <select id="filtroCatProduto" class="form-input" onchange="carregarProdutos()">
+                                <option value="">Todas Categorias</option>
+                            </select>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nome</th>
+                                    <th>Categoria</th>
+                                    <th>Fornecedor</th>
+                                    <th>Preço de Compra</th>
+                                    <th>Preço de Venda</th>
+                                    <th>Estoque</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="produtosTabela">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== FORNECEDORES ==================== -->
+            <section id="page-fornecedores" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-truck"></i> Fornecedores</h3>
+                        <button class="btn btn-primary" onclick="abrirModalFornecedor()">
+                            <i class="fas fa-plus"></i> Novo Fornecedor
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="filters">
+                            <input type="text" id="buscaFornecedor" class="form-input" placeholder="Buscar fornecedor..."
+                                oninput="carregarFornecedores()">
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Telefone</th>
+                                    <th>NUIT</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fornecedoresTabela">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== CATEGORIAS ==================== -->
+            <section id="page-categorias" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-tags"></i> Categorias</h3>
+                        <button class="btn btn-primary" onclick="abrirModalCategoria()">
+                            <i class="fas fa-plus"></i> Nova Categoria
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoriasTabela">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- ==================== MODAIS ==================== -->
+
+    <!-- Modal Produto -->
+    <div class="modal-overlay" id="modalProduto">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalProdutoTitulo">Novo Produto</h3>
+                <button class="modal-close" onclick="fecharModal('modalProduto')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="produtoId">
+                <div class="form-group">
+                    <label>Código</label>
+                    <input type="text" id="produtoCodigo" class="form-input" placeholder="Ex: PROD007">
+                </div>
+                <div class="form-group">
+                    <label>Nome *</label>
+                    <input type="text" id="produtoNome" class="form-input" placeholder="Nome do produto">
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <input type="text" id="produtoDescricao" class="form-input" placeholder="Descrição">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Preço de Compra *</label>
+                        <input type="number" id="produtoPrecoCompra" class="form-input" step="0.01" min="0"
+                            placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Preço de Venda *</label>
+                        <input type="number" id="produtoPrecoVenda" class="form-input" step="0.01" min="0"
+                            placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Estoque</label>
+                        <input type="number" id="produtoEstoque" class="form-input" min="0" placeholder="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Categoria</label>
+                        <select id="produtoCategoria" class="form-input">
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fornecedor</label>
+                        <select id="produtoFornecedor" class="form-input">
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal('modalProduto')">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarProduto()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Fornecedor -->
+    <div class="modal-overlay" id="modalFornecedor">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalFornecedorTitulo">Novo Fornecedor</h3>
+                <button class="modal-close" onclick="fecharModal('modalFornecedor')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="fornecedorId">
+                <div class="form-group">
+                    <label>Nome *</label>
+                    <input type="text" id="fornecedorNome" class="form-input" placeholder="Nome da empresa">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="fornecedorEmail" class="form-input" placeholder="email@exemplo.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="text" id="fornecedorTelefone" class="form-input" placeholder="Ex: 84 123 4567">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>NUIT</label>
+                    <input type="text" id="fornecedorNuit" class="form-input" placeholder="Ex: 400123456">
+                </div>
+                <div class="form-group">
+                    <label>Endereço</label>
+                    <input type="text" id="fornecedorEndereco" class="form-input" placeholder="Endereço completo">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal('modalFornecedor')">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarFornecedor()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Produtos Baratos do Fornecedor -->
+    <div class="modal-overlay" id="modalFornecedorProdutos">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h3 id="modalFornecedorProdutosTitulo">Análise de Produtos - Fornecedor</h3>
+                <button class="modal-close" onclick="fecharModal('modalFornecedorProdutos')">&times;</button>
+            </div>
+            <div class="modal-body" id="modalFornecedorProdutosConteudo">
+                <p>Carregando...</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal('modalFornecedorProdutos')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Categoria -->
+    <div class="modal-overlay" id="modalCategoria">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Nova Categoria</h3>
+                <button class="modal-close" onclick="fecharModal('modalCategoria')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nome *</label>
+                    <input type="text" id="categoriaNome" class="form-input" placeholder="Nome da categoria">
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <input type="text" id="categoriaDescricao" class="form-input" placeholder="Descrição">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal('modalCategoria')">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarCategoria()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes Venda -->
+    <div class="modal-overlay" id="modalDetalheVenda">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h3>Detalhes da Venda</h3>
+                <button class="modal-close" onclick="fecharModal('modalDetalheVenda')">&times;</button>
+            </div>
+            <div class="modal-body" id="detalheVendaConteudo">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal('modalDetalheVenda')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>
